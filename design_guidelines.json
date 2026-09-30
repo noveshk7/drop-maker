@@ -1,0 +1,150 @@
+{
+  "project_title": "Esports Drop Map Creator / Team Drop Placement Tool",
+  "theme_summary": {
+    "style": "Dark Esports Tactical Command HUD",
+    "background_base": "#0B0F19",
+    "panel_background": "rgba(15, 23, 42, 0.75)",
+    "primary_accent": "#8B5CF6",
+    "secondary_accent": "#3B82F6",
+    "neon_glow": "#06B6D4",
+    "warning_alert": "#F59E0B",
+    "danger": "#EF4444",
+    "success": "#10B981",
+    "text_primary": "#F8FAFC",
+    "text_secondary": "#94A3B8",
+    "border_subtle": "rgba(255, 255, 255, 0.12)",
+    "border_glow": "rgba(139, 92, 246, 0.4)"
+  },
+  "typography": {
+    "heading_font": "Rajdhani, Orbitron, sans-serif",
+    "body_font": "Inter, system-ui, sans-serif",
+    "mono_font": "JetBrains Mono, Fira Code, monospace",
+    "font_files_import": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap');",
+    "hierarchy": {
+      "hero_title": "font-heading text-3xl md:text-5xl font-extrabold uppercase tracking-wider text-slate-50 drop-shadow-[0_0_12px_rgba(139,92,246,0.3)]",
+      "section_title": "font-heading text-xl md:text-2xl font-bold uppercase tracking-wide text-slate-100 flex items-center gap-2",
+      "card_title": "font-heading text-lg font-semibold tracking-wide text-slate-100",
+      "body": "font-sans text-sm md:text-base text-slate-300 leading-relaxed",
+      "caption": "font-sans text-xs text-slate-400 font-medium tracking-normal",
+      "badge_label": "font-mono text-xs uppercase tracking-widest font-semibold"
+    }
+  },
+  "colors": {
+    "background": {
+      "app": "bg-[#0B0F19]",
+      "canvas": "bg-[#05070D]",
+      "sidebar": "bg-slate-900/80 backdrop-blur-xl border-r border-slate-800/80",
+      "modal": "bg-slate-950/90 backdrop-blur-2xl border border-slate-800 shadow-2xl shadow-purple-950/40",
+      "card": "bg-slate-900/60 hover:bg-slate-800/60 border border-slate-800/90 transition-colors"
+    },
+    "accents": {
+      "purple_glow": "shadow-[0_0_20px_rgba(139,92,246,0.25)] border-purple-500/40",
+      "blue_glow": "shadow-[0_0_20px_rgba(59,130,246,0.25)] border-blue-500/40",
+      "cyan_glow": "shadow-[0_0_15px_rgba(6,182,212,0.3)] border-cyan-400/50",
+      "active_tab": "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-600/30"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-slate-900/75 border border-slate-800/80 shadow-xl",
+    "hud_scanlines": "relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] before:bg-[length:100%_4px] before:pointer-events-none before:z-10",
+    "tactical_grid_bg": "bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px]",
+    "corner_accents": "relative after:absolute after:bottom-0 after:right-0 after:w-2 after:h-2 after:border-r-2 after:border-b-2 after:border-purple-500 before:absolute before:top-0 before:left-0 before:w-2 before:h-2 before:border-l-2 before:border-t-2 before:border-purple-500",
+    "connector_line": "stroke-cyan-400 stroke-2 [stroke-dasharray:4_4] animate-pulse drop-shadow-[0_0_6px_rgba(6,182,212,0.8)]"
+  },
+  "layout_and_workspace": {
+    "editor_shell": "flex h-screen w-screen overflow-hidden bg-[#0B0F19] text-slate-100 font-sans antialiased select-none",
+    "top_navbar": "h-14 w-full bg-slate-950/90 border-b border-slate-800/90 flex items-center justify-between px-4 z-30 shrink-0 backdrop-blur-md",
+    "left_toolbar": "w-16 bg-slate-950/80 border-r border-slate-800/80 flex flex-col items-center py-3 gap-3 z-20 shrink-0",
+    "main_canvas_area": "flex-1 relative overflow-hidden bg-[#05070D] flex items-center justify-center p-4 cursor-grab active:cursor-grabbing",
+    "right_properties_panel": "w-80 md:w-96 bg-slate-950/85 border-l border-slate-800/80 flex flex-col z-20 shrink-0 backdrop-blur-xl transition-all duration-300",
+    "bottom_status_bar": "h-8 w-full bg-slate-950 border-t border-slate-800/90 flex items-center justify-between px-4 text-xs font-mono text-slate-400 z-30 shrink-0"
+  },
+  "user_workflow": [
+    "Step 1: Dashboard / Library view displays existing projects & map templates with initial Sample Demo Project pre-loaded.",
+    "Step 2: Create or select project -> Opens Tactical Editor workspace.",
+    "Step 3: Upload/Select Game Map image (e.g., Free Fire Bermuda, Purgatory, Kalahari, Alpine, PUBG Erangel, Miramar, Rondo). Map saved persistently in IndexedDB.",
+    "Step 4: Add reusable Esports Teams in Team Manager library (Team Name, Tag shortcode, Color, Logo Image URL/Upload). Pre-populated with sample esports teams (e.g., LOUD, Alpha7, Team Falcons, Nigma Galaxy, EVOS Esports).",
+    "Step 5: Select marker mode (Tag Marker vs Image-Logo Marker).",
+    "Step 6: Click on Map at specific POI/drop zone (e.g., Factory, Clock Tower, Peak, Pochinki, Military Base) to place drop spot.",
+    "Step 7: Assign 1 to 5 teams to the drop location. System automatically calculates geometric 1–5 team layout clusters (Radial offset, Grid split, Fan layout).",
+    "Step 8: Fine-tune markers manually via drag-and-drop. System dynamically draws tactical connector lines back to POI anchor point.",
+    "Step 9: Real-time IndexedDB/Local Storage autosave with visual 'Autosaved' HUD indicator.",
+    "Step 10: High-Resolution PNG Export with customizable watermark, map scale, tournament title, match/day details, and team summary card."
+  ],
+  "sample_data": {
+    "default_maps": [
+      {
+        "id": "map_bermuda",
+        "name": "Bermuda (Free Fire)",
+        "game": "Free Fire",
+        "width": 2048,
+        "height": 2048,
+        "image_url": "https://images.unsplash.com/photo-1508348337955-1df36ce030d0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA6ODl8MHwxfHNlYXJjaHwxfHxhZXJpYWwlMjB2aWV3JTIwaXNsYW5kJTIwdGFjdGljYWwlMjBnYW1lJTIwbWFwJTIwc2F0ZWxsaXRlfGVufDB8fHx8MTc9MDc1NTIyNHww&ixlib=rb-4.1.0&q=85",
+        "pois": ["Peak", "Clock Tower", "Factory", "Pochinok", "Bimasakti Strip", "Mill", "Cape Town", "Shipyard", "Mars Electric", "Graveyard"]
+      },
+      {
+        "id": "map_erangel",
+        "name": "Erangel (PUBG Mobile)",
+        "game": "PUBG Mobile",
+        "width": 2048,
+        "height": 2048,
+        "image_url": "https://images.unsplash.com/photo-1586032438251-35e41c893b10?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA6ODl8MHwxfHNlYXJjaHw0fHxhZXJpYWwlMjB2aWV3JTIwaXNsYW5kJTIwdGFjdGljYWwlMjBnYW1lJTIwbWFwJTIwc2F0ZWxsaXRlfGVufDB8fHx8MTc9MDc1NTIyNHww&ixlib=rb-4.1.0&q=85",
+        "pois": ["Pochinki", "Sosnovka Military Base", "Georgopol", "Rozhok", "Yasnaya Polyana", "School", "Mylta Power", "Novorepnoye"]
+      }
+    ],
+    "sample_teams": [
+      {
+        "id": "team_01",
+        "name": "LOUD Esports",
+        "tag": "LOUD",
+        "color": "#10B981",
+        "logo_url": "https://images.unsplash.com/photo-1740252117012-bb53ad05e370?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHwzfHxnYW1pbmclMjBhdmF0YXIlMjBpY29ufGVufDB8fHx8MTc5MDc1NTIyOXww&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "id": "team_02",
+        "name": "Team Falcons",
+        "tag": "FLCN",
+        "color": "#8B5CF6",
+        "logo_url": "https://images.unsplash.com/photo-1772371272141-0fbd644b65c4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHw0fHxnYW1pbmclMjBhdmF0YXIlMjBpY29ufGVufDB8fHx8MTc9MDc1NTIyOXww&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "id": "team_03",
+        "name": "EVOS Phoenix",
+        "tag": "EVOS",
+        "color": "#3B82F6",
+        "logo_url": "https://images.unsplash.com/photo-1740252117013-4fb21771e7ca?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHwyfHxnYW1pbmclMjBhdmF0YXIlMjBpY29ufGVufDB8fHx8MTc9MDc1NTIyOXww&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "id": "team_04",
+        "name": "Alpha7 Esports",
+        "tag": "A7",
+        "color": "#F59E0B",
+        "logo_url": "https://images.unsplash.com/photo-1740252117027-4275d3f84385?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHwxfHxnYW1pbmclMjBhdmF0YXIlMjBpY29ufGVufDB8fHx8MTc9MDc1NTIyOXww&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "id": "team_05",
+        "name": "Nigma Galaxy",
+        "tag": "NGX",
+        "color": "#EC4899",
+        "logo_url": "https://images.pexels.com/photos/15367435/pexels-photo-15367435.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+      }
+    ]
+  },
+  "key_components_to_build": {
+    "Navbar": "Top navigation bar with project title edit, map switch dropdown, undo/redo, clear markers, autosave status badge, and Export PNG CTA.",
+    "MapLibraryModal": "Modal/View to browse saved map templates, upload new game map images with scaling factor, or select standard presets.",
+    "TeamLibraryDrawer": "Side panel to manage team roster, add/edit/delete teams, search teams, change brand color, upload/paste custom logo URL.",
+    "DropMarkerCanvas": "Interactive HTML5 Canvas / SVG overlay rendering relative map coordinates (% x, % y), team marker clusters (1 to 5 layout shapes), connector lines, and drag handlers.",
+    "LayoutArranger": "Automatic 1-5 team drop position generator: 1=Centered, 2=Side-by-side duo split, 3=Triangle fan, 4=Quad grid, 5=Pentagon star around POI.",
+    "MarkerPropertiesPanel": "Right sidebar section to toggle marker style (Text Tag vs Logo Icon vs Full Badge), line thickness, connector line style (Dashed/Solid/Glow), scale size, label opacity.",
+    "ExportCanvasModal": "High-res PNG generator with title header banner ('FREE FIRE WORLD SERIES 2026 - DROP MAP'), team roster footer legend, grid toggle, dark tactical frame."
+  },
+  "general_ui_ux_guidelines": {
+    "test_id_requirement": "All interactive and key informational elements MUST include a data-testid attribute in kebab-case (e.g. data-testid='map-library-button', data-testid='team-add-input', data-testid='export-png-button').",
+    "js_file_extension": "Codebase uses standard JavaScript (.js / .jsx) files. Guidelines and components must match JS modules.",
+    "header_background": "Never use pure transparent header backgrounds; always apply glassmorphism backdrop-blur-md bg-slate-950/80.",
+    "hover_contrast": "Always explicitly define hover text and background pairs (e.g., hover:bg-purple-600 hover:text-white).",
+    "accessibility": "Ensure focus rings with ring-2 ring-purple-500 ring-offset-2 ring-offset-slate-950 for keyboard navigation.",
+    "empty_states": "Provide clear call-to-action tactical cards when no maps or teams are selected."
+  }
+}
