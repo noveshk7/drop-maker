@@ -25,8 +25,13 @@ export interface Project {
 }
 export interface Template { id: string; name: string; project: Project }
 export interface Preferences { markerShape: MarkerShape; exportFormat: 'png' | 'jpeg' | 'webp'; trimLogos: boolean }
-export interface Workspace { version: 2; maps: MapAsset[]; teams: Team[]; projects: Project[]; templates: Template[]; preferences: Preferences }
-export interface ProjectFile { format: 'dropmap-project'; version: 2; map: MapAsset; teams: Team[]; project: Project }
+export interface Region { id: string; name: string }
+export interface Workspace { version: 2; maps: MapAsset[]; teams: Team[]; regions: Region[]; projects: Project[]; templates: Template[]; preferences: Preferences }
+export interface ProjectFile { format: 'dropmap-project'; version: 2; map: MapAsset; teams: Team[]; project: Project; regions?: Region[] }
+export const defaultRegions = (): Region[] => ['SEA', 'BRAZIL', 'VIETNAM', 'BANGLA', 'INDIA', 'MENA', 'MALAYSIA', 'INDONESIA'].map(name => ({ id: `region-${name.toLowerCase()}`, name }));
+export const normalizeRegionName = (name: string) => name.trim().replace(/\s+/g, ' ').toUpperCase();
+export const teamRegionName = (team: Team, regions: Region[]) => regions.find(r => r.id === team.regionId)?.name ?? 'Unassigned';
+export const matchesRegion = (team: Team, filter: string, regions: Region[]) => filter === 'all' || (filter === 'unassigned' ? !regions.some(r => r.id === team.regionId) : team.regionId === filter);
 export const id = (prefix: string) => `${prefix}_${crypto.randomUUID()}`;
 export const clamp = (n: number, min = 0, max = 100) => Math.max(min, Math.min(max, n));
 export const fonts = ['Sora', 'Instrument Sans', 'JetBrains Mono', 'Georgia', 'Verdana'];
@@ -93,7 +98,7 @@ export function migrate(old: DropMapStore): Workspace {
     markers: p.markers.map(m => ({ ...newMarker(old.teams.find(t => t.id === m.teamId) ?? { id: m.teamId, color: '#ffffff', name: '', tag: '' }, { id: m.dropId, x: m.x, y: m.y, name: '', layoutMode: 'manual', allowMore: false, showName: false }, m.type), ...m })),
     layers: defaultLayers().map(l => ({ ...l, visible: l.id === 'connectors' ? p.showConnectors : l.id === 'drops' ? p.showAnchors : l.visible })),
   }));
-  return { version: 2, maps: old.maps, teams: old.teams, projects, templates: [], preferences: { markerShape: 'circle', exportFormat: 'png', trimLogos: true } };
+  return { version: 2, maps: old.maps, teams: old.teams, regions: defaultRegions(), projects, templates: [], preferences: { markerShape: 'circle', exportFormat: 'png', trimLogos: true } };
 }
 export function demoWorkspace(): Workspace {
   const workspace = migrate(createDemoStore());
@@ -121,7 +126,11 @@ export async function loadWorkspace(): Promise<Workspace> {
     request.onsuccess = () => resolve(request.result as Workspace | undefined);
     request.onerror = () => reject(request.error);
   });
-  if (stored?.version === 2) return stored;
+  if (stored?.version === 2) {
+    // Only seed groups for older workspaces. An intentionally emptied list stays empty.
+    const regions = stored.regions ?? defaultRegions();
+    return { ...stored, regions, teams: stored.teams.map(t => t.regionId && !regions.some(r => r.id === t.regionId) ? { ...t, regionId: undefined } : t) };
+  }
   const legacy = localStorage.getItem('drop-map-creator-store-v1');
   if (legacy) {
     try { const old = JSON.parse(legacy) as DropMapStore; if (Array.isArray(old.maps) && Array.isArray(old.teams) && Array.isArray(old.projects)) return migrate(old); } catch { /* Preserve the old entry; use the demo without deleting anything. */ }
@@ -166,7 +175,8 @@ export const filename = (name: string) => name.replace(/[^a-z0-9-_]+/gi, '-').re
 export function projectFile(workspace: Workspace, project: Project): ProjectFile {
   const map = workspace.maps.find(m => m.id === project.mapId);
   if (!map) throw new Error('The project map is missing.');
-  return { format: 'dropmap-project', version: 2, map, project, teams: workspace.teams.filter(t => project.markers.some(m => m.teamId === t.id)) };
+  const teams = workspace.teams.filter(t => project.markers.some(m => m.teamId === t.id));
+  return { format: 'dropmap-project', version: 2, map, project, teams, regions: workspace.regions.filter(r => teams.some(t => t.regionId === r.id)) };
 }
 export function exportProject(workspace: Workspace, project: Project) {
   download(new Blob([JSON.stringify(projectFile(workspace, project))], { type: 'application/json' }), `${filename(project.name)}.project`);
@@ -193,6 +203,10 @@ export async function importProject(file: File, workspace: Workspace): Promise<{
   if (!color(p.connectorColor) || !num(p.connectorWidth, .1, 12) || !num(p.gridOpacity, 0, 1) || !num(p.view.zoom, .25, 8) || !num(p.view.x, -10000, 10000) || !num(p.view.y, -10000, 10000)) return fail();
   const unique = (items: Record<string, unknown>[]) => items.every(i => str(i.id)) && new Set(items.map(i => i.id)).size === items.length;
   if (![value.teams, p.markers, p.drops, p.labels, p.routes].every(unique)) return fail();
+  const regionRows = value.regions ?? [];
+  if (!arr(regionRows, 2000) || !unique(regionRows) || !regionRows.every(r => typeof r.id === 'string' && r.id.length > 0 && typeof r.name === 'string' && normalizeRegionName(r.name).length > 0 && normalizeRegionName(r.name).length <= 40 && !['ALL REGIONS', 'UNASSIGNED'].includes(normalizeRegionName(r.name)))) return fail();
+  if (new Set(regionRows.map(r => normalizeRegionName(r.name as string))).size !== regionRows.length) return fail();
+  if (!value.teams.every(t => t.regionId === undefined || (typeof t.regionId === 'string' && regionRows.some(r => r.id === t.regionId)))) return fail();
   if (!value.teams.every(t => str(t.name) && str(t.tag) && color(t.color) && (!t.logoData || asset(t.logoData)))) return fail();
   if (!p.drops.every(d => str(d.name) && point(d) && ['auto', 'manual'].includes(String(d.layoutMode)) && typeof d.allowMore === 'boolean' && typeof d.showName === 'boolean')) return fail();
   const importedDrops = p.drops, importedTeams = value.teams;
@@ -205,7 +219,15 @@ export async function importProject(file: File, workspace: Workspace): Promise<{
   await Promise.all(bundle.teams.filter(t => t.logoData).map(t => loadImage(t.logoData!)));
   const map = { ...bundle.map, id: id('map'), createdAt: Date.now() };
   const teamIds = new Map(bundle.teams.map(t => [t.id, id('team')]));
-  const teams = bundle.teams.map(t => ({ ...t, id: teamIds.get(t.id)! }));
+  const regions = [...workspace.regions];
+  const regionIds = new Map<string, string>();
+  for (const source of bundle.regions ?? []) {
+    const name = normalizeRegionName(source.name);
+    let region = regions.find(r => normalizeRegionName(r.name) === name);
+    if (!region) { region = { id: id('region'), name }; regions.push(region); }
+    regionIds.set(source.id, region.id);
+  }
+  const teams = bundle.teams.map(t => ({ ...t, id: teamIds.get(t.id)!, regionId: t.regionId ? regionIds.get(t.regionId) : undefined }));
   const project: Project = { ...bundle.project, id: id('project'), mapId: map.id, name: `${bundle.project.name} · Imported`, markers: bundle.project.markers.map(k => ({ ...k, teamId: teamIds.get(k.teamId)! })), updatedAt: Date.now() };
-  return { workspace: { ...workspace, maps: [...workspace.maps, map], teams: [...workspace.teams, ...teams], projects: [project, ...workspace.projects] }, project };
+  return { workspace: { ...workspace, regions, maps: [...workspace.maps, map], teams: [...workspace.teams, ...teams], projects: [project, ...workspace.projects] }, project };
 }

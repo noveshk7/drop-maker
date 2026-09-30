@@ -8,7 +8,8 @@ Workspace version 2 uses IndexedDB database `drop-map-studio`, object store `wor
 
 ## Data model
 - `MapAsset`: id/name/game/version/description/source image data URL/dimensions/createdAt
-- `Team`: id/name/tag/color/optional logo data URL, globally reusable
+- `Team`: id/name/tag/color/optional logo data URL/optional regionId, globally reusable; one region or Unassigned
+- `Region`: id/name; workspace stores editable region groups with stable IDs
 - `Project`: mapId, drops, markers, text labels, routes, ordered visible/locked layers, connector/grid settings, saved zoom/pan, updatedAt
 - `Drop`: relative percentage x/y, name, auto/manual layout, allow-more-than-five-manually, show-name flag
 - `Marker`: team/drop references; relative x/y; tag/logo; circle/pin/rounded/square/custom shape; scale/rotation/opacity; text/font/color/background/border/shadow; logo scale/fit/padding/x/y; visible/locked/connector flags
@@ -31,6 +32,9 @@ Workspace version 2 uses IndexedDB database `drop-map-studio`, object store `wor
 11. Save project as a named reusable template; use creates independent project; rename/delete templates. Saved maps can be used as clean templates.
 12. Shared SVG scene rasterized to Canvas for PNG/JPG/WEBP export, with logos, fonts, transparency where supported, all visible layers and no selection/editor UI. Original/high (up to 8192px), standard, 2K/4K; original/Instagram portrait/story/square/YouTube/custom canvases fit without cropping. Custom bounded to 8192px and 40MP. Same source SVG guarantees relative positions across editor/export. Export preview is presentation only.
 13. Settings: defaults, browser storage usage/persistence request, keyboard guide, nondestructive fresh demo, confirmed workspace clear. Clear does not reseed on refresh.
+14. Teams are grouped by region, with count chips and combined name/tag/region search in the Teams library. Default groups: SEA, BRAZIL, VIETNAM, BANGLA, INDIA, MENA, MALAYSIA, INDONESIA. Existing and demo teams remain Unassigned; no region is guessed. Add/edit team forms provide a one-region selector; the editor team picker has a region dropdown with counts and per-team region badges.
+15. Teams → Manage groups lets users add, rename, and delete regions. Names trim/collapse whitespace and normalize to uppercase; blank, duplicate (case-insensitive), reserved All regions/Unassigned and >40-character names are rejected. Deletion requires confirmation, atomically moves members to Unassigned, and does not modify markers, drops, projects or templates. Unassigned is a built-in nondeletable category. Region changes and assignments persist in IndexedDB. Older version-2 workspaces gain defaults only when their regions field is absent; intentionally empty/deleted lists are preserved on refresh.
+16. Project exports include region definitions used by their embedded teams. Import validates region names and references, merges groups by normalized name, remaps IDs safely, and preserves assignments. Older project files without region metadata still import as Unassigned.
 
 ## Auth and roles
 No authentication. All app capabilities are available locally in the current browser.

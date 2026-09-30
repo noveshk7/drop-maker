@@ -19,6 +19,7 @@ export interface Team {
   tag: string;
   color: string;
   logoData?: string;
+  regionId?: string;
 }
 
 export interface DropMarker {

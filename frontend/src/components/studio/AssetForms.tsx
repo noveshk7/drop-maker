@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Check, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { id, readImage, type MapAsset, type Team, type Workspace } from '@/lib/studio';
+import { id, readImage, type MapAsset, type Region, type Team, type Workspace } from '@/lib/studio';
 import { Action, Field, Modal, SelectField } from './Controls';
 
 export function MapForm({ existing, onSave, onClose }: { existing?: MapAsset; onSave: (map: MapAsset) => void; onClose: () => void }) {
@@ -15,13 +15,15 @@ export function MapForm({ existing, onSave, onClose }: { existing?: MapAsset; on
     <Field label="Map name" testId="map-name-input" value={name} onChange={setName} maxLength={100} placeholder="Bermuda" /><div className="field-pair"><Field label="Game (optional)" testId="map-game-input" value={game} onChange={setGame} maxLength={80} /><Field label="Version (optional)" testId="map-version-input" value={version} onChange={setVersion} maxLength={40} placeholder="OB53" /></div><Field label="Description (optional)" testId="map-description-input" value={description} onChange={setDescription} maxLength={400} /><button className="studio-submit" data-testid="map-save-button" disabled={!name.trim() || !image || busy} type="submit"><Check size={16} />Save map to library</button>
   </form></Modal>;
 }
-export function TeamForm({ existing, trimLogos, onSave, onClose }: { existing?: Team; trimLogos: boolean; onSave: (team: Team) => void; onClose: () => void }) {
+export function TeamForm({ existing, regions, trimLogos, onSave, onClose }: { existing?: Team; regions: Region[]; trimLogos: boolean; onSave: (team: Team) => void; onClose: () => void }) {
   const [name, setName] = useState(existing?.name ?? ''), [tag, setTag] = useState(existing?.tag ?? ''), [color, setColor] = useState(existing?.color ?? '#8b5cf6');
   const [logo, setLogo] = useState(existing?.logoData), [busy, setBusy] = useState(false);
+  const [regionId, setRegionId] = useState(existing?.regionId ?? '');
   const upload = async (file?: File) => { if (!file) return; setBusy(true); try { setLogo((await readImage(file, trimLogos)).data); } catch (e) { toast.error((e as Error).message); } finally { setBusy(false); } };
-  return <Modal title={existing ? 'Edit your team' : 'Add a reusable team'} description="One roster. Every map. Logos keep their original aspect ratio." testId="team-modal" onClose={onClose}><form className="form-stack" data-testid="team-form" onSubmit={e => { e.preventDefault(); if (!name.trim() || !tag.trim() || busy) return; onSave({ id: existing?.id ?? id('team'), name: name.trim(), tag: tag.trim().toUpperCase(), color, logoData: logo }); onClose(); }}>
+  return <Modal title={existing ? 'Edit your team' : 'Add a reusable team'} description="One roster. Every map. Logos keep their original aspect ratio." testId="team-modal" onClose={onClose}><form className="form-stack" data-testid="team-form" onSubmit={e => { e.preventDefault(); if (!name.trim() || !tag.trim() || busy) return; onSave({ id: existing?.id ?? id('team'), name: name.trim(), tag: tag.trim().toUpperCase(), color, logoData: logo, regionId: regions.some(r => r.id === regionId) ? regionId : undefined }); onClose(); }}>
     <div className="team-form-preview" data-testid="team-preview"><div style={{ borderColor: color }}>{logo ? <img data-testid="team-logo-preview" src={logo} alt="Team logo preview" /> : <b data-testid="team-tag-preview">{tag || 'TAG'}</b>}</div><p data-testid="team-name-preview">{name || 'Your next contender'}</p></div>
     <Field label="Team name" testId="team-name-input" value={name} onChange={setName} maxLength={100} placeholder="Fusion Phoenix" /><div className="field-pair"><Field label="Team tag / short ID" testId="team-tag-input" value={tag} onChange={setTag} maxLength={8} placeholder="FU" /><Field label="Team color" testId="team-color-input" type="color" value={color} onChange={setColor} /></div>
+    <SelectField label="Region group" testId="team-region-select" value={regionId} onChange={setRegionId} options={[{ value: '', label: 'Unassigned' }, ...regions.map(r => ({ value: r.id, label: r.name }))]} />
     <label className="studio-field" data-testid="team-logo-field"><span data-testid="team-logo-label">Logo · PNG, JPG or WEBP</span><input data-testid="team-logo-input" type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { void upload(e.target.files?.[0]); e.target.value = ''; }} /></label>{logo && <Action testId="team-remove-logo-button" danger onClick={() => setLogo(undefined)}>Remove logo</Action>}<p className="note" data-testid="team-logo-trim-note">{trimLogos ? 'Transparent PNG padding is trimmed automatically where possible.' : 'Original logo padding is preserved.'}</p><button type="submit" className="studio-submit" data-testid="team-modal-save-button" disabled={!name.trim() || !tag.trim() || busy}><Check size={16} />{busy ? 'Reading logo…' : 'Save team'}</button>
   </form></Modal>;
 }

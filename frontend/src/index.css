@@ -441,6 +441,39 @@ select option { background: #101624; color: #dbe5f6; }
 .editor-status > span:last-child { color: #68728b; }
 .mobile-editor-nav, .mobile-panel-close { display: none; }
 
+/* Reusable regional roster groups */
+.team-regions { margin-bottom: 28px; padding: 21px 24px; border: 1px solid #ffffff10; border-radius: 11px; background: linear-gradient(110deg, #171426, #101824); }
+.team-regions-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 19px; }
+.team-regions-heading > div { display: flex; gap: 12px; align-items: center; }
+.team-regions-heading svg { color: #b39bdf; flex-shrink: 0; }
+.team-regions-heading h2 { font: 550 14px 'Sora Variable', sans-serif; color: #e4e8f3; }
+.team-regions-heading p { font-size: 11px; line-height: 1.6; color: #8491a8; margin-top: 5px; }
+.region-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.region-filters button { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border: 1px solid #ffffff0d; background: #090e1866; border-radius: 6px; color: #9aa7bf; font: 9px 'JetBrains Mono Variable', monospace; letter-spacing: .25px; }
+.region-filters button:hover { border-color: #b693f54d; color: #e0d1fa; background: #9f76e910; }
+.region-filters button.active { border-color: #ac86f36b; color: #e0cfff; background: #9462e723; box-shadow: 0 0 16px #7f4dcb08; }
+.region-filters em { min-width: 17px; border-radius: 4px; background: #ffffff08; padding: 2px 4px; color: #8391ab; font-style: normal; text-align: center; font-size: 8px; }
+.region-filters button.active em { color: #dfcbff; background: #9e75e829; }
+.region-roster-section { margin-top: 25px; }
+.region-roster-heading { display: flex; align-items: center; gap: 11px; margin-bottom: 14px; }
+.region-roster-heading h2 { font: 550 12px 'JetBrains Mono Variable', monospace; letter-spacing: 1px; color: #bac6df; }
+.region-roster-heading > span { font-size: 10px; color: #6e7c96; }
+.team-region-badge { display: inline-block; font: 8px 'JetBrains Mono Variable', monospace; letter-spacing: .3px; color: #b0a0d2; padding: 4px 6px; border: 1px solid #a384d327; border-radius: 4px; background: #8b5cf608; margin: 0 0 7px; max-width: 100%; overflow-wrap: anywhere; }
+.team-picker-item > .team-region-badge { margin: 10px 0 0; font-size: 7px; }
+.region-form { display: flex; flex-direction: column; gap: 10px; padding-bottom: 18px; border-bottom: 1px solid #ffffff0b; }
+.region-form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.region-form-actions .studio-submit { padding: 9px 13px; font-size: 11px; }
+.region-form-error { color: #f1a2a6; font-size: 11px; line-height: 1.6; }
+.region-manager-list { display: flex; flex-direction: column; gap: 6px; max-height: 290px; overflow-y: auto; }
+.region-manager-row { display: flex; align-items: center; gap: 5px; padding: 8px 9px 8px 14px; border: 1px solid #ffffff0b; background: #ffffff02; border-radius: 7px; }
+.region-manager-row > div { flex: 1; min-width: 0; }
+.region-manager-row b { display: block; font: 500 11px 'JetBrains Mono Variable', monospace; color: #bfcbe0; overflow-wrap: anywhere; }
+.region-manager-row span { display: block; font-size: 9px; color: #6b7b98; margin-top: 4px; }
+.region-manager-row .studio-action { padding: 6px; min-height: 29px; }
+.region-delete-confirm { padding: 15px; background: #ef444407; border: 1px solid #ef444432; border-radius: 8px; }
+.region-delete-confirm > p { font-size: 11px; line-height: 1.8; color: #d7a9b0; margin-bottom: 10px; }
+@media (max-width: 600px) { .team-regions { padding: 18px 15px; } .team-regions-heading { align-items: flex-start; flex-direction: column; gap: 10px; } .team-regions-heading .studio-action { padding: 6px 0; } .region-filters { gap: 6px; } .region-filters button { min-height: 38px; padding: 9px 10px; font-size: 8px; } }
+
 @media (min-width: 1550px) { .inspector-shell { width: 330px; } .inspector-scroll { padding-left: 22px; padding-right: 22px; } }
 @media (max-width: 1150px) {
   .library-header { padding: 0 24px; } .local-badge { display: none; } .library-main { padding: 30px 30px 0; }
