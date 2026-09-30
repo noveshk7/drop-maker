@@ -1,26 +1,45 @@
-# DROP//MAP MVP Spec
+# DROP//MAP Studio — Living Spec
 
 ## Product
-DROP//MAP is a browser-local esports drop-map creator. Users reuse saved maps and teams to build project-specific tactical drop sheets and export a PNG.
+DROP//MAP is a browser-local esports drop-map creator with a shared SVG scene for interactive editing and high-resolution image export. Public preview: https://map-placement-pro.preview.emergentagent.com
 
 ## Persistence
-Maps, reusable teams, projects, drops, markers, and editor toggles persist in `localStorage` under `drop-map-creator-store-v1`. The initial store seeds a functional Bermuda demo project and five sample teams. No accounts or third-party integrations are used.
+Workspace version 2 uses IndexedDB database `drop-map-studio`, object store `workspace`, key `current`. It migrates existing `drop-map-creator-store-v1` localStorage data without deleting the original. Empty libraries remain empty after refresh. Saves show Saving / Saved locally / Save failed, and failure warns before closing. No account, cloud storage, or external integration. Browser storage is not cross-device storage; downloadable self-contained project files provide backups. Original map uploads are kept uncompressed at their decoded natural dimensions. Image input: PNG/JPEG/WEBP, up to 50MB and 16384px per dimension. Demo is an illustrated Bermuda-inspired practice map, explicitly not an official game asset.
 
 ## Data model
-- `MapAsset`: name, game, version, source image data URL, dimensions
-- `Team`: name, tag, color, optional logo data URL
-- `Project`: map reference, drops, markers, connector/anchor visibility, updated timestamp
-- `DropLocation`: relative x/y percentage, name, auto/manual layout mode
-- `DropMarker`: team/drop references, tag or logo marker type, relative x/y, scale, rotation, visibility, locked state
+- `MapAsset`: id/name/game/version/description/source image data URL/dimensions/createdAt
+- `Team`: id/name/tag/color/optional logo data URL, globally reusable
+- `Project`: mapId, drops, markers, text labels, routes, ordered visible/locked layers, connector/grid settings, saved zoom/pan, updatedAt
+- `Drop`: relative percentage x/y, name, auto/manual layout, allow-more-than-five-manually, show-name flag
+- `Marker`: team/drop references; relative x/y; tag/logo; circle/pin/rounded/square/custom shape; scale/rotation/opacity; text/font/color/background/border/shadow; logo scale/fit/padding/x/y; visible/locked/connector flags
+- `TextLabel`: relative x/y, text/font/size/color/background/alignment/bold/shadow/rotation/opacity/locked
+- `Route`: relative points, line/polyline/arrow, color/width/opacity/dashed/locked
+- `Template`: named project snapshot referencing a saved map and reusable teams
+- `Preferences`: new-marker default shape, export format, trim transparent PNG padding
 
 ## Key flows
-1. Dashboard opens with demo project and saved Bermuda map.
-2. Upload a PNG/JPG/WEBP map to add it to the local map library.
-3. Create a project from any saved map.
-4. In the editor choose Add Drop and click the map.
-5. Assign reusable teams as TAG or LOGO markers. Up to five markers are auto-arranged around the drop.
-6. Drag markers to switch a drop to manual layout; connector lines remain tied to the drop anchor.
-7. Toggle anchor/connector layers and export a clean PNG.
+1. Functional Dashboard, Maps, Projects, Teams, Templates, Settings navigation; search in each library. Dashboard opens with demo project and five sample teams.
+2. Map upload/name/description/game/version; edit details, duplicate, delete with confirmation and related-project warning. Source stays unmodified.
+3. Create named project choosing any map; open, duplicate, delete, export/import self-contained .project JSON including embedded map/logos and validated relationships.
+4. Create/edit/delete reusable teams. Upload and intelligently fit logos; optionally trim transparent PNG padding. Tag or logo selected on assignment. Missing logo opens team edit rather than silently exporting a tag.
+5. SVG editor: click Add Drop, click map, assign teams. Entire auto group rearranges on add/remove/resize: center/horizontal/equilateral triangle/square/regular pentagon. Auto max 5; explicit manual-more-than-5 option. Automatic layout tries nearby translations to avoid other markers and app-created text and shifts clusters inside map bounds. It does not OCR underlying raster-map labels.
+6. Select from canvas/drop list/assigned team chips; named drops center view. Drag a marker to switch its drop to manual without changing assignment. Drag/drop/label/route, resize/rotate marker handles, full property controls, locks, duplicate/delete. Connector styles and per-marker toggle.
+7. Ordered layer panel: background, grid, connectors, drops, routes, markers, labels. Visibility and locks; reorder overlay layers. Background remains bottom and undestructive. Grid coordinates and opacity.
+8. Text tool and line/arrow/polyline tools. Click route points; finish polyline with button or Enter. Edit text and route properties. Drag entire paths.
+9. Undo/redo stores up to 100 project snapshots. Pointer drag and range slider gestures are one action. New edits clear redo. Undo-restored snapshots autosave. History is per open editor session, not persisted across refresh. Keyboard: Ctrl/Cmd Z, Shift Z, Y, S, E; Delete; Space pan; Esc deselect/cancel; Enter finish polyline.
+10. Mouse/trackpad wheel anchored zoom, zoom buttons, pan tool/Space/middle mouse, fit/reset, fullscreen where browser supported. Touch pointer gestures support pinch zoom/two-finger pan. Responsive mobile bottom Select/Add/Drops/Teams/Layers/Export controls and collapsible inspector; text/routes/undo also available in mobile top tool rail.
+11. Save project as a named reusable template; use creates independent project; rename/delete templates. Saved maps can be used as clean templates.
+12. Shared SVG scene rasterized to Canvas for PNG/JPG/WEBP export, with logos, fonts, transparency where supported, all visible layers and no selection/editor UI. Original/high (up to 8192px), standard, 2K/4K; original/Instagram portrait/story/square/YouTube/custom canvases fit without cropping. Custom bounded to 8192px and 40MP. Same source SVG guarantees relative positions across editor/export. Export preview is presentation only.
+13. Settings: defaults, browser storage usage/persistence request, keyboard guide, nondestructive fresh demo, confirmed workspace clear. Clear does not reseed on refresh.
 
 ## Auth and roles
 No authentication. All app capabilities are available locally in the current browser.
+
+## Implementation and verification
+New entry page: `pages/Workspace.tsx`. Model/storage/migration/validation: `lib/studio.ts`. Project history: `lib/use-project-history.ts`. UI: `components/studio/{Library,AssetForms,Editor,Inspector,MapScene,ExportDialog,Controls}.tsx`. Existing `lib/drop-map.ts` supplies backward-compatible seed/migration input only. Backend remains template health/status API; domain data never leaves the browser. API router inclusion is last in server.py.
+
+## Known product boundaries
+- Local storage only; clearing site data can remove it. Browser may decline persistent-storage requests; project backups remain available.
+- No official game-map downloads or image-label OCR; upload a current game map. Collision avoidance is best-effort, with manual override.
+- Fullscreen availability depends on browser. Performance depends on image size/device; 100+ SVG markers is a target, not an unlimited-scene guarantee.
+- No accounts or login credentials.

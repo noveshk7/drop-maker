@@ -1,0 +1,77 @@
+{
+  "iteration": 1,
+  "mode": "generate",
+  "summary": "All 8 acceptance-matrix criteria exercised: 1 backend test file + 7 named browser checks. Every artifact passed after selector/timing fixes (no application code changed).",
+  "passed": 8,
+  "failed": 0,
+  "flaky": 0,
+  "blocked": 0,
+  "test_error": 0,
+  "retest_needed": false,
+  "bugs": [],
+  "action_items": [],
+  "checks": [
+    {
+      "criterion": "Runtime health and practical large-scene behavior (API smoke)",
+      "name": "test_tscheck_runtime_health.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/ -> 200; GET /api/status -> 200. App is browser-local (IndexedDB); backend only exposes template health/status endpoints."
+    },
+    {
+      "criterion": "Persistent map/team/project libraries with complete local workflows",
+      "name": "library-map-team-project-workflow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Uploaded 900x500 (non-16:10) PNG map, verified natural dims shown ('900 x 500'), created team (name+tag), created project on new map, confirmed editor loaded with project name, reloaded browser and confirmed map/team/project all persisted in their libraries."
+    },
+    {
+      "criterion": "Exact automatic layouts, manual override, drop and marker editing",
+      "name": "layouts-auto-arrange-and-manual-drag",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Assigned 1..5 of the 5 seeded teams to one drop, screenshot-verified center/horizontal/triangle/square/pentagon progression; created a 6th team via UI, auto-assign blocked with toast 'This drop already contains 5 teams...', canvas-counts stayed at 5; enabled 'Allow more than 5 manually' toggle then successfully added the 6th marker (canvas-counts -> 6)."
+    },
+    {
+      "criterion": "True undo/redo history including pointer gestures, settings, and keyboard",
+      "name": "undo-redo-history-pointer-and-keyboard",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Drop creation undo/redo verified via canvas-counts (1 DROP <-> 0 DROPS); marker size-slider drag committed as one undo step (slider reverted to original value in a single undo click); confirmed a new edit after undo clears redo (redo button became disabled); Ctrl+Z / Ctrl+Shift+Z keyboard shortcuts (after blurring the range input) correctly restored/re-applied the size value."
+    },
+    {
+      "criterion": "Annotations and layer controls",
+      "name": "annotations-text-routes-and-layers",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Created a text label (verified via text-content-input value), a straight line, an arrow, and a 3-point polyline finished via the Finish button; opened Layers panel and toggled a layer's visibility (Eye/EyeOff) and lock (Lock/Unlock) twice each; adjusted connector dashed toggle and grid-coordinates toggle successfully."
+    },
+    {
+      "criterion": "Image exports and portable project round-trip",
+      "name": "export-image-and-project-roundtrip",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Exported PNG at Square preset (1080x1080); parsed downloaded PNG's IHDR chunk directly (bytes 16-24) confirming width=1080 height=1080 pixels, not just a successful download; exported .project JSON and re-imported it successfully (toast 'Project, map and logos restored', editor title suffixed '· Imported'); fed an invalid-JSON file to the same import input and confirmed graceful rejection via visible toast 'This is not a valid JSON project file.' with no crash."
+    },
+    {
+      "criterion": "Templates, navigation and settings are functional",
+      "name": "templates-navigation-and-settings",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Navigated Dashboard/Maps/Projects/Teams/Templates/Settings via main nav; library search filtered out non-matching text; saved a template from the editor, confirmed 'Use template' opens an independent project (renaming the new project's title did not change the saved template), renamed the template via rename-template-name/-save, then deleted it after a delete confirmation dialog; changed default marker shape/export format preferences; exercised persistent-storage request (toast feedback shown); confirmed 'Add fresh demo project' is nondestructive (adds new rows) and that 'Clear this workspace' requires a confirmation dialog (cancelled, not confirmed, to avoid touching seeded data)."
+    },
+    {
+      "criterion": "Zoom/pan/fullscreen and mobile touch controls",
+      "name": "zoom-pan-fullscreen-and-mobile-controls",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Verified zoom-in/out buttons change editor-zoom-value (100%->125%->...), fit/reset button restores 100%, mouse-wheel anchored zoom changes zoom value, pan tool selectable; fullscreen button engaged native fullscreen (exited programmatically to continue the check - browser-support-dependent behavior as expected); resized to 390x844 mobile viewport and confirmed bottom nav (Select/Add/Drops/Teams/Layers/Export) is visible, added a drop via mobile Add tool, opened Teams inspector panel, closed it via mobile-close-panel, and confirmed no horizontal page overflow at mobile width."
+    }
+  ],
+  "notes": [
+    "Matrix has 8 criteria; all 8 covered exactly (1 backend + 7 browser artifacts) as instructed.",
+    "App is entirely browser-local (IndexedDB) with no domain REST API, so only a generic health/status smoke test applies to the backend lane; all functional criteria are UI-driven.",
+    "Fixture discipline respected: all created rows use 'tscheck-' prefixes; no seeded demo rows (map_bermuda_demo, project_demo, 5 seeded teams) were edited, duplicated, or deleted by any check. The one destructive action (Clear workspace) was only opened and then cancelled.",
+    "'Add fresh demo project' check intentionally adds a duplicate Bermuda demo project/teams set each run per the nondestructive-demo criterion; this is expected residue from exercising that specific feature, not a violation."
+  ]
+}
